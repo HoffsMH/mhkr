@@ -19,8 +19,9 @@ mkfs.vfat -F 32 /dev/nvme0n1p1
 mkfs.vfat -F 32 /dev/nvme0n1p2
 
 mount /dev/mapper/cryptroot /mnt
-mkdir -p /mnt/boot/efi
+mkdir -p /mnt/boot
 mount /dev/nvme0n1p1 /mnt/boot
+mkdir -p /mnt/boot/efi
 mount /dev/nvme0n1p2 /mnt/boot/efi
 
 pacstrap \
