@@ -39,8 +39,7 @@ echo "###############################################"
 echo "hoffs PASSWORD"
 echo "###############################################"
 
-useradd -m -G wheel,tty,input,network,sys,video,storage,lp,audio,video
--s /usr/bin/zsh hoffs
+useradd -m -G wheel,tty,input,network,sys,video,storage,lp,audio,video -s /usr/bin/zsh hoffs
 
 passwd hoffs
 
@@ -52,12 +51,13 @@ echo "###############################################"
 refind-install
 
 echo "###############################################"
-echo "Edit /etc/mkinitcpio"
+echo "Edit /etc/mkinitcpio.conf"
 echo "###############################################"
 echo ''
 echo 'HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)'
 
-echo 'HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)' >> /etc/mkinitcpio
+echo 'HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)' >> /etc/mkinitcpio.conf
+
 nvim /etc/mkinitcpio
 
 echo "###############################################"
