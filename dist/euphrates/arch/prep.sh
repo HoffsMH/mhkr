@@ -5,8 +5,8 @@ set -e
 loadkeys us
 timedatectl set-ntp true
 
-mkswap /dev/nvme0n1p3
-swapon /dev/nvme0n1p3
+mkswap /dev/nvme0n1p3 || echo "mkswap failed"
+swapon /dev/nvme0n1p3 || echo "swapon failed"
 
 echo "###############################################"
 echo "disk password"
@@ -14,6 +14,7 @@ echo "###############################################"
 cryptsetup luksFormat /dev/nvme0n1p4
 cryptsetup open /dev/nvme0n1p4 cryptroot
 
+mkfs.btrfs /dev/mapper/cryptroot
 mkfs.vfat -F 32 /dev/nvme0n1p1
 mkfs.vfat -F 32 /dev/nvme0n1p2
 
