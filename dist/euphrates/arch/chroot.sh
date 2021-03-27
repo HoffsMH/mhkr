@@ -58,7 +58,7 @@ echo 'HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encr
 
 echo 'HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)' >> /etc/mkinitcpio.conf
 
-nvim /etc/mkinitcpio
+nvim /etc/mkinitcpio.conf
 
 echo "###############################################"
 echo "Edit /boot/refind_linux.conf"
@@ -66,6 +66,7 @@ echo "###############################################"
 echo ''
 echo 'ro cryptdevice=UUID=<device-UUID-from-blkid-here>:cryptroot root=/dev/mapper/cryptroot'
 
+echo '"ro cryptdevice=UUID=<device-UUID-from-blkid-here>:cryptroot root=/dev/mapper/cryptroot"' >> /boot/refind_linux.conf
 blkid >> /boot/refind_linux.conf
 
 nvim /boot/refind_linux.conf
