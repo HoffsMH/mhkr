@@ -38,6 +38,7 @@ pacstrap \
   iwd \
   base-devel \
   zsh \
-  dhcpcd
+  dhcpcd \
+  openssh
 
 genfstab -U /mnt > /mnt/etc/fstab
