@@ -14,7 +14,6 @@ locale-gen
 localectl set-keymap --no-convert us
 loadkeys us
 
-
 echo "euphrates" >> /etc/hostname
 
 # sudoers thing

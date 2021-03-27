@@ -39,6 +39,7 @@ pacstrap \
   base-devel \
   zsh \
   dhcpcd \
-  openssh
+  openssh \
+  nvidia
 
 genfstab -U /mnt > /mnt/etc/fstab
