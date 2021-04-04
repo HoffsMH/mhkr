@@ -2,7 +2,6 @@
 
 set -e
 
-pacman-mirrors -f
 # pacman -Syu --noconfirm
 # pacman -S vim --noconfirm
 
@@ -25,6 +24,9 @@ mount /dev/nvme0n1p1 /mnt/boot
 mkdir -p /mnt/boot/efi
 mount /dev/nvme0n1p2 /mnt/boot/efi
 
+pacman-mirrors -f
+# pacman -Syu --noconfirm
+# pacman -S vim --noconfirm
 
 basestrap \
   /mnt \
@@ -40,3 +42,5 @@ basestrap \
   zsh
 
 fstabgen -U /mnt > /mnt/etc/fstab
+
+curl https://mhkr.io/euphrates/manjaro-chroot.sh > /mnt/chroot.sh
