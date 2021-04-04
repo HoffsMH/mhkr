@@ -23,3 +23,18 @@ mkdir -p /mnt/boot/efi
 mount /dev/nvme0n1p2 /mnt/boot/efi
 
 sudo pacman-mirrors -f
+
+basestrap \
+  /mnt \
+  linux54 \
+  linux-firmware \
+  dhcpcd \
+  refind \
+  mkinitcpio \
+  efibootmgr \
+  neovim \
+  base-devel \
+  openssh \
+  zsh
+
+genfstab -U /mnt > /mnt/etc/fstab

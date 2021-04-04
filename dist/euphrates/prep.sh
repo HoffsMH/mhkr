@@ -15,6 +15,7 @@ cryptsetup luksFormat /dev/nvme0n1p4
 cryptsetup open /dev/nvme0n1p4 cryptroot
 
 mkfs.btrfs /dev/mapper/cryptroot
+genfstab -U /mnt > /mnt/etc/fstab
 mkfs.vfat -F 32 /dev/nvme0n1p1
 mkfs.vfat -F 32 /dev/nvme0n1p2
 
@@ -28,7 +29,7 @@ pacstrap \
   /mnt \
   reflector \
   neovim \
-  linux54 \
+  linux-lts \
   linux-firmware \
   base \
   git \
