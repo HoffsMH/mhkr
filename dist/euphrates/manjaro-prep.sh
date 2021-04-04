@@ -52,3 +52,4 @@ basestrap \
 fstabgen -U /mnt > /mnt/etc/fstab
 
 curl https://mhkr.io/euphrates/manjaro-chroot.sh > /mnt/chroot.sh
+manjaro-chroot /mnt zsh /chroot.sh
