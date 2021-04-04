@@ -28,7 +28,7 @@ pacstrap \
   /mnt \
   reflector \
   neovim \
-  linux \
+  linux54 \
   linux-firmware \
   base \
   git \
