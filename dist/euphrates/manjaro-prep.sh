@@ -2,7 +2,7 @@
 
 set -e
 
-# pacman-mirrors -f
+pacman-mirrors -f
 # pacman -Syu --noconfirm
 # pacman -S vim --noconfirm
 
