@@ -5,6 +5,14 @@ set -e
 # pacman -Syu --noconfirm
 # pacman -S vim --noconfirm
 
+# cleanup from any prev attempts
+umount -l /dev/nvme0n1p1 || echo "cleanup failed"
+umount -l /dev/nvme0n1p2 || echo "cleanup failed"
+umount -l /dev/mapper/cryptroot || echo "cleanup failed"
+cryptsetup close cryptroot || echo "cleanup failed"
+swapoff /dev/nvme0n1p3 || echo "cleanup failed"
+
+
 mkswap /dev/nvme0n1p3 || echo "mkswap failed"
 swapon /dev/nvme0n1p3 || echo "swapon failed"
 
