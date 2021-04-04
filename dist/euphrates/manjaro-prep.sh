@@ -2,8 +2,9 @@
 
 set -e
 
-pacman -Syu --noconfirm
-pacman -S vim --noconfirm
+# pacman-mirrors -f
+# pacman -Syu --noconfirm
+# pacman -S vim --noconfirm
 
 mkswap /dev/nvme0n1p3 || echo "mkswap failed"
 swapon /dev/nvme0n1p3 || echo "swapon failed"
@@ -24,7 +25,6 @@ mount /dev/nvme0n1p1 /mnt/boot
 mkdir -p /mnt/boot/efi
 mount /dev/nvme0n1p2 /mnt/boot/efi
 
-sudo pacman-mirrors -f
 
 basestrap \
   /mnt \
