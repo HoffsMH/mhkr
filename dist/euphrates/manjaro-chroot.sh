@@ -71,4 +71,6 @@ blkid >> /boot/refind_linux.conf
 
 nvim /boot/refind_linux.conf
 
+mhwd -a pci nonfree 0300
+
 mkinitcpio -P
