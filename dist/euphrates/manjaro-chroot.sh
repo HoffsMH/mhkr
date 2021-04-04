@@ -12,7 +12,7 @@ sudo echo "en_US ISO-8859-1" >> /etc/locale.gen
 
 locale-gen
 
-echo "euphrates" >> /etc/hostname
+echo "euphrates" > /etc/hostname
 
 # sudoers thing
 if [  -f /etc/sudoers.d/10-installer ]; then

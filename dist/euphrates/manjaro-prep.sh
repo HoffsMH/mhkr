@@ -50,7 +50,9 @@ basestrap \
   zsh \
   systemd-sysvcompat \
   mhwd \
-  btrfs-progs
+  btrfs-progs \
+  yay \
+  iwd
 
 
 
