@@ -52,7 +52,8 @@ basestrap \
   mhwd \
   btrfs-progs \
   yay \
-  iwd
+  iwd \
+  manjaro-tools
 
 
 
