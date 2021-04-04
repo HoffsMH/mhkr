@@ -49,7 +49,9 @@ basestrap \
   openssh \
   zsh \
   systemd-sysvcompat \
-  mhwd
+  mhwd \
+  btrfs-progs
+
 
 
 fstabgen -U /mnt > /mnt/etc/fstab
