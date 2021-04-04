@@ -2,6 +2,8 @@
 
 set -e
 
+pacman -Syu --noconfirm
+pacman -S vim --noconfirm
 
 mkswap /dev/nvme0n1p3 || echo "mkswap failed"
 swapon /dev/nvme0n1p3 || echo "swapon failed"
@@ -37,4 +39,4 @@ basestrap \
   openssh \
   zsh
 
-genfstab -U /mnt > /mnt/etc/fstab
+fstabgen -U /mnt > /mnt/etc/fstab
