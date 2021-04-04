@@ -48,7 +48,8 @@ basestrap \
   base-devel \
   openssh \
   zsh \
-  systemd-sysvcompat
+  systemd-sysvcompat \
+  mhwd
 
 
 fstabgen -U /mnt > /mnt/etc/fstab
