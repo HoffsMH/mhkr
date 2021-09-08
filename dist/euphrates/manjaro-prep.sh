@@ -1,36 +1,40 @@
 #!/bin/bash
 
 set -e
+root_partition=/dev/nvme0n1p4
+boot_partition=/dev/nvme0n1p1
+efi_partition=/dev/nvme0n1p2
+swap=/dev/nvme0n1p3
 
 # pacman -Syu --noconfirm
 # pacman -S vim --noconfirm
 
 # cleanup from any prev attempts
-umount -l /dev/nvme0n1p1 || echo "cleanup failed"
-umount -l /dev/nvme0n1p2 || echo "cleanup failed"
-umount -l /dev/mapper/cryptroot || echo "cleanup failed"
-cryptsetup close cryptroot || echo "cleanup failed"
-swapoff /dev/nvme0n1p3 || echo "cleanup failed"
+umount -l $boot_partition || echo "cleanup failed on umounting"
+umount -l /dev/nvme0n1p2 || echo "cleanup failed on umounting "
+umount -l /dev/mapper/cryptroot || echo "cleanup failed on umounting cryptroot"
+cryptsetup close cryptroot || echo "cleanup failed on closing cryptroot"
+swapoff $swap || echo "cleanup failed"
 
 
-mkswap /dev/nvme0n1p3 || echo "mkswap failed"
-swapon /dev/nvme0n1p3 || echo "swapon failed"
+mkswap $swap || echo "mkswap failed"
+swapon $swap || echo "swapon failed"
 
 echo "###############################################"
 echo "disk password"
 echo "###############################################"
-cryptsetup luksFormat /dev/nvme0n1p4
-cryptsetup open /dev/nvme0n1p4 cryptroot
+cryptsetup luksFormat $root_partition
+cryptsetup open $root_partition cryptroot
 
-mkfs.btrfs /dev/mapper/cryptroot
-mkfs.vfat -F 32 /dev/nvme0n1p1
-mkfs.vfat -F 32 /dev/nvme0n1p2
+mkfs.ext4 /dev/mapper/cryptroot
+mkfs.vfat -F 32 $boot_partition
+mkfs.vfat -F 32 $efi_partition
 
 mount /dev/mapper/cryptroot /mnt
 mkdir -p /mnt/boot
-mount /dev/nvme0n1p1 /mnt/boot
+mount $boot_partition /mnt/boot
 mkdir -p /mnt/boot/efi
-mount /dev/nvme0n1p2 /mnt/boot/efi
+mount $efi_partition /mnt/boot/efi
 
 pacman-mirrors -f
 # pacman -Syu --noconfirm
@@ -38,7 +42,7 @@ pacman-mirrors -f
 
 basestrap \
   /mnt \
-  linux54 \
+  linux510 \
   linux-firmware \
   dhcpcd \
   refind \
@@ -50,10 +54,10 @@ basestrap \
   zsh \
   systemd-sysvcompat \
   mhwd \
-  btrfs-progs \
   yay \
   iwd \
-  manjaro-tools
+  manjaro-tools \
+  ntp
 
 
 
