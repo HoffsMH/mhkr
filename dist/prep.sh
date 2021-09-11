@@ -35,7 +35,7 @@ basestrap \
   /mnt \
   linux510 \
   linux-firmware \
-  dhcpcd \
+  dhclient \
   refind \
   mkinitcpio \
   efibootmgr \
