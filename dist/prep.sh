@@ -46,7 +46,7 @@ basestrap \
   systemd-sysvcompat \
   mhwd \
   yay \
-  iwd \
+  networkmanager \
   manjaro-tools \
   man-db \
   ntp
