@@ -25,6 +25,9 @@ systemctl start iwd.service || echo "no iwd"
 systemctl enable dhcpcd.service || echo "no dhcpcd"
 systemctl start dhcpcd.service || echo "no dhcpcd"
 
+systemctl enable NetworkManager.service || echo "no network manager"
+systemctl start NetworkManager.service || echo "no network manager"
+
 echo "###############################################"
 echo "ROOT PASSWORD"
 echo "###############################################"
