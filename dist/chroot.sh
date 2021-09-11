@@ -2,10 +2,6 @@
 
 set -e
 
-ntpd -qg
-timedatectl set-timezone "$(curl --fail https://ipapi.co/timezone)"
-hwclock -w
-
 sudo echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 sudo echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 sudo echo "en_US ISO-8859-1" >> /etc/locale.gen
