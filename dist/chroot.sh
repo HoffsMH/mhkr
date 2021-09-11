@@ -2,7 +2,8 @@
 
 set -e
 
-ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime
+ntpd -qg
+timedatectl set-timezone "$(curl --fail https://ipapi.co/timezone)"
 hwclock -w
 
 sudo echo "LANG=en_US.UTF-8" >> /etc/locale.conf
@@ -11,7 +12,7 @@ sudo echo "en_US ISO-8859-1" >> /etc/locale.gen
 
 locale-gen
 
-echo "euphrates" > /etc/hostname
+echo "$1" > /etc/hostname
 
 # sudoers thing
 if [  -f /etc/sudoers.d/10-installer ]; then

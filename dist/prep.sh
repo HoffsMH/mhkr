@@ -56,4 +56,4 @@ fstabgen -U /mnt > /mnt/etc/fstab
 
 curl https://mhkr.io/chroot.sh > /mnt/chroot.sh
 
-manjaro-chroot /mnt zsh /chroot.sh
+manjaro-chroot /mnt zsh /chroot.sh $machine_hostname
