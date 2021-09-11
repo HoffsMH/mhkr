@@ -1,14 +1,5 @@
 #!/bin/bash
 
-set -e
-root_partition=/dev/nvme0n1p4
-boot_partition=/dev/nvme0n1p1
-efi_partition=/dev/nvme0n1p2
-swap=/dev/nvme0n1p3
-
-# pacman -Syu --noconfirm
-# pacman -S vim --noconfirm
-
 # cleanup from any prev attempts
 umount -l $boot_partition || echo "cleanup failed on umounting"
 umount -l /dev/nvme0n1p2 || echo "cleanup failed on umounting "
@@ -57,12 +48,12 @@ basestrap \
   yay \
   iwd \
   manjaro-tools \
+  man-db \
+  networkmanager-iwd \
   ntp
-
-
 
 fstabgen -U /mnt > /mnt/etc/fstab
 
-curl https://mhkr.io/euphrates/manjaro-chroot.sh > /mnt/chroot.sh
+curl https://mhkr.io/chroot.sh > /mnt/chroot.sh
 
 manjaro-chroot /mnt zsh /chroot.sh
