@@ -49,7 +49,6 @@ basestrap \
   iwd \
   manjaro-tools \
   man-db \
-  networkmanager-iwd \
   ntp
 
 fstabgen -U /mnt > /mnt/etc/fstab
