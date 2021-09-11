@@ -40,6 +40,15 @@ useradd -m -G wheel,tty,input,network,sys,video,storage,lp,audio,video -s /usr/b
 passwd hoffs
 
 echo "###############################################"
+echo "Edit /etc/fstab"
+echo "###############################################"
+echo ''
+echo "edit swap uuid to be correct" >> /etc/fstab
+blkid >> /etc/fstab
+
+nvim /etc/fstab
+
+echo "###############################################"
 echo "refind install"
 echo "###############################################"
 
