@@ -21,7 +21,7 @@ mkfs.ext4 /dev/mapper/cryptroot
 mkfs.vfat -F 32 $boot_partition
 
 if [ -z ${efi_partition+x} ]; then
-
+  echo "no efi!"
 else
   mkfs.vfat -F 32 $efi_partition
   mkdir -p /mnt/boot/efi
