@@ -51,11 +51,20 @@ blkid >> /etc/fstab
 
 nvim /etc/fstab
 
-echo "###############################################"
-echo "refind install"
-echo "###############################################"
+if [ -d "/boot/efi" ]; then
+  echo "###############################################"
+  echo "refind install"
+  echo "###############################################"
 
-refind-install
+  refind-install
+else
+  echo "###############################################"
+  echo "grub install"
+  echo "###############################################"
+
+  grub-install
+
+fi
 
 echo "###############################################"
 echo "Edit /etc/mkinitcpio.conf"
@@ -67,16 +76,19 @@ echo 'HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encr
 
 nvim /etc/mkinitcpio.conf
 
-echo "###############################################"
-echo "Edit /boot/refind_linux.conf"
-echo "###############################################"
-echo ''
-echo 'ro cryptdevice=UUID=<device-UUID-from-blkid-here>:cryptroot root=/dev/mapper/cryptroot'
+if [ -d "/boot/efi" ]; then
+  echo "###############################################"
+  echo "Edit /boot/refind_linux.conf"
+  echo "###############################################"
+  echo ''
+  echo 'ro cryptdevice=UUID=<device-UUID-from-blkid-here>:cryptroot root=/dev/mapper/cryptroot'
 
-echo '"ro cryptdevice=UUID=<device-UUID-from-blkid-here>:cryptroot root=/dev/mapper/cryptroot"' >> /boot/refind_linux.conf
-blkid >> /boot/refind_linux.conf
+  echo '"ro cryptdevice=UUID=<device-UUID-from-blkid-here>:cryptroot root=/dev/mapper/cryptroot"' >> /boot/refind_linux.conf
+  blkid >> /boot/refind_linux.conf
 
-nvim /boot/refind_linux.conf
+  nvim /boot/refind_linux.conf
+fi
+
 
 mhwd -a pci nonfree 0300
 

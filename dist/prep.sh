@@ -19,13 +19,19 @@ cryptsetup open $root_partition cryptroot
 
 mkfs.ext4 /dev/mapper/cryptroot
 mkfs.vfat -F 32 $boot_partition
-mkfs.vfat -F 32 $efi_partition
+
+if [ -z ${efi_partition+x} ]; then
+
+else
+  mkfs.vfat -F 32 $efi_partition
+  mkdir -p /mnt/boot/efi
+  mount $efi_partition /mnt/boot/efi
+fi
+
 
 mount /dev/mapper/cryptroot /mnt
 mkdir -p /mnt/boot
 mount $boot_partition /mnt/boot
-mkdir -p /mnt/boot/efi
-mount $efi_partition /mnt/boot/efi
 
 pacman-mirrors -f
 # pacman -Syu --noconfirm
