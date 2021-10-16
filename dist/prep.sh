@@ -55,7 +55,8 @@ basestrap \
   networkmanager \
   manjaro-tools \
   man-db \
-  ntp
+  ntp \
+  grub
 
 fstabgen -U /mnt > /mnt/etc/fstab
 
