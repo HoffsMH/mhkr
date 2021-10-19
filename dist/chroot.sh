@@ -62,7 +62,7 @@ else
   echo "grub install"
   echo "###############################################"
 
-  grub-install
+  grub-install /dev/sda
 
 fi
 
