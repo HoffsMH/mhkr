@@ -62,8 +62,16 @@ else
   echo "grub install"
   echo "###############################################"
 
-  grub-install /dev/sda
+  echo "===========================================================" >> /etc/default/grub
+  echo "edit GRUB_CMDLINE_LINUX to have correct uuid of cryptdevice" >> /etc/default/grub
+  echo 'GRUB_CMDLINE_LINUX="cryptdevice=UUID=29b3cd1c-5e66-400a-bdd9-c4d5821df063:cryptroot root=/dev/mapper/cryptroot"' >> /etc/default/grub
+  echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
+  blkid >> /etc/default/grub
 
+  nvim /etc/default/grub
+
+  grub-install /dev/sda
+  grub-mkconfig -o /boot/grub/grub.cfg
 fi
 
 echo "###############################################"
