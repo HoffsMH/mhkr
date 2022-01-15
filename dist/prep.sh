@@ -24,6 +24,7 @@ mkfs.vfat -F 32 $boot_partition
 if [ -z ${efi_partition+x} ]; then
   echo "no efi!"
 else
+  echo "efi found!"
   mkfs.vfat -F 32 $efi_partition
   mkdir -p /mnt/boot/efi
   mount $efi_partition /mnt/boot/efi
@@ -63,4 +64,4 @@ fstabgen -U /mnt > /mnt/etc/fstab
 
 curl https://mhkr.io/chroot.sh > /mnt/chroot.sh
 
-manjaro-chroot /mnt zsh /chroot.sh $machine_hostname
+manjaro-chroot /mnt zsh /chroot.sh $machine_hostname $efi_partition

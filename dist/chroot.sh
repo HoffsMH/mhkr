@@ -51,7 +51,9 @@ blkid >> /etc/fstab
 
 nvim /etc/fstab
 
-if [ -d "/boot/efi" ]; then
+
+# if a second argument is specified
+if [ -z ${$2+x} ]; then
   echo "###############################################"
   echo "refind install"
   echo "###############################################"
