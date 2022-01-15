@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # cleanup from any prev attempts
-umount -l $boot_partition || echo "cleanup failed on umounting"
-umount -l /dev/nvme0n1p2 || echo "cleanup failed on umounting "
+umount -l $boot_partition || echo "cleanup failed on umounting boot"
+umount -l $efi_partition || echo "cleanup failed on umounting efi"
 umount -l /dev/mapper/cryptroot || echo "cleanup failed on umounting cryptroot"
 cryptsetup close cryptroot || echo "cleanup failed on closing cryptroot"
+umount -l $root_partition || echo "cleanup failed on umounting root_partition"
 swapoff $swap || echo "cleanup failed"
 
 
