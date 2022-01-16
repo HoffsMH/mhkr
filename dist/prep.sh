@@ -3,6 +3,7 @@
 # cleanup from any prev attempts
 umount -l $boot_partition || echo "cleanup failed on umounting boot"
 if [ -z ${efi_partition+x} ]; then
+  echo "no efi!"
 else
   umount -l $efi_partition || echo "cleanup failed on umounting efi"
 fi
