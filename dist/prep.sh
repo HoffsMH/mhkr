@@ -2,7 +2,9 @@
 
 # cleanup from any prev attempts
 umount -l $boot_partition || echo "cleanup failed on umounting boot"
-umount -l $efi_partition || echo "cleanup failed on umounting efi"
+if [ -z ${efi_partition+x} ]; then
+  umount -l $efi_partition || echo "cleanup failed on umounting efi"
+fi
 umount -l /dev/mapper/cryptroot || echo "cleanup failed on umounting cryptroot"
 cryptsetup close cryptroot || echo "cleanup failed on closing cryptroot"
 umount -l $root_partition || echo "cleanup failed on umounting root_partition"

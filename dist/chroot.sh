@@ -53,7 +53,7 @@ nvim /etc/fstab
 
 
 # if a second argument is specified
-if [ -z ${$2+x} ]; then
+if [ $# -gt 1 ]; then
   echo "###############################################"
   echo "refind install"
   echo "###############################################"
