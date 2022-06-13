@@ -52,6 +52,7 @@ basestrap \
   mkinitcpio \
   efibootmgr \
   neovim \
+  vim \
   base-devel \
   openssh \
   zsh \
