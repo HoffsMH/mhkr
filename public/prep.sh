@@ -45,6 +45,7 @@ pacman-mirrors -f
 
 basestrap \
   /mnt \
+  polkit\
   linux510 \
   linux-firmware \
   dhclient \
