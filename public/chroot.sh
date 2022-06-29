@@ -106,12 +106,9 @@ mhwd -a pci nonfree 0300
 
 mkinitcpio -P
 
-yay -S --noconfirm paru
-
 echo "###############################################"
 echo "Do anything else that needs to be done"
-echo "such as wifi drivers"
-echo "mt7610u_wifi_sta"
 echo "###############################################"
+
 
 /usr/bin/zsh
