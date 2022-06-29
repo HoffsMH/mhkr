@@ -105,3 +105,9 @@ fi
 mhwd -a pci nonfree 0300
 
 mkinitcpio -P
+
+echo "###############################################"
+echo "Do anything else that needs to be done"
+echo "###############################################"
+
+zsh
