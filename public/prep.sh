@@ -64,7 +64,8 @@ basestrap \
   manjaro-tools \
   man-db \
   ntp \
-  grub
+  grub \
+  mt7610u_wifi_sta
 
 fstabgen -U /mnt > /mnt/etc/fstab
 
