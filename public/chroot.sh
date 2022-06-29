@@ -110,4 +110,4 @@ echo "###############################################"
 echo "Do anything else that needs to be done"
 echo "###############################################"
 
-zsh
+/usr/bin/zsh
