@@ -10,6 +10,9 @@ locale-gen
 
 echo "$1" > /etc/hostname
 
+# disable beep
+echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
+
 # sudoers thing
 if [  -f /etc/sudoers.d/10-installer ]; then
   sed -i 's/^\s*\(%wheel\s\+ALL=(ALL)\)\sALL/\1 NOPASSWD: ALL/' /etc/sudoers.d/10-installer
