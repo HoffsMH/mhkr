@@ -68,6 +68,6 @@ basestrap \
 
 fstabgen -U /mnt > /mnt/etc/fstab
 
-curl https://mhkr.io/chroot.sh > /mnt/chroot.sh
+curl https://mhkr.xyz/run/chroot.sh > /mnt/chroot.sh
 
 manjaro-chroot /mnt zsh /chroot.sh $machine_hostname $efi_partition

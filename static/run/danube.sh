@@ -7,7 +7,7 @@ export efi_partition=/dev/nvme0n1p2
 export swap=/dev/nvme0n1p3
 export machine_hostname="danube"
 
-curl https://mhkr.io/prep.sh > prep.sh
+curl https://mhkr.xyz/run/prep.sh > prep.sh
 chmod +x prep.sh
 
 ./prep.sh

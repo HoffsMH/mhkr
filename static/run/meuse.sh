@@ -6,7 +6,7 @@ export boot_partition=/dev/sda1
 export swap=/dev/sda2
 export machine_hostname="meuse"
 
-curl https://mhkr.io/prep.sh > prep.sh
+curl https://mhkr.xyz/run/prep.sh > prep.sh
 chmod +x prep.sh
 
 ./prep.sh
