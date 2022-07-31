@@ -1,7 +1,12 @@
 #!/bin/bash
 
 # cleanup from any prev attempts
-umount -l $boot_partition || echo "cleanup failed on umounting boot"
+if [ -z ${boot_partition+x} ]; then
+  echo "no boot!"
+else
+  umount -l $boot_partition || echo "cleanup failed on umounting boot"
+fi
+
 if [ -z ${efi_partition+x} ]; then
   echo "no efi!"
 else
@@ -23,7 +28,12 @@ cryptsetup luksFormat $root_partition
 cryptsetup open $root_partition cryptroot
 
 mkfs.ext4 /dev/mapper/cryptroot
-mkfs.vfat -F 32 $boot_partition
+
+if [ -z ${boot_partition+x} ]; then
+  echo "no boot! no mkfs"
+else
+  mkfs.vfat -F 32 $boot_partition
+fi
 
 if [ -z ${efi_partition+x} ]; then
   echo "no efi!"
@@ -37,7 +47,11 @@ fi
 
 mount /dev/mapper/cryptroot /mnt
 mkdir -p /mnt/boot
-mount $boot_partition /mnt/boot
+if [ -z ${boot_partition+x} ]; then
+  echo "no boot! no mkfs"
+else
+  mount $boot_partition /mnt/boot
+fi
 
 pacman-mirrors -f
 # pacman -Syu --noconfirm
