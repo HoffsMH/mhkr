@@ -56,7 +56,6 @@ blkid >> /etc/fstab
 
 nvim /etc/fstab
 
-
 # if a second argument is specified
 if [ $# -gt 1 ]; then
   echo "###############################################"
