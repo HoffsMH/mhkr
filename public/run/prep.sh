@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo pacman -Syu --noconfirm || echo "pacman update failed expectedly"
+sudo pacman -S nvim zsh
+
 # cleanup from any prev attempts
 if [ -z ${boot_partition+x} ]; then
   echo "no boot!"
