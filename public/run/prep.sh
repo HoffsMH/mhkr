@@ -1,6 +1,7 @@
 #!/bin/bash
 
-sudo pacman -S neovim zsh
+sudo pacman -Syy
+sudo pacman -S --noconfirm neovim zsh
 
 # cleanup from any prev attempts
 if [ -z ${boot_partition+x} ]; then
