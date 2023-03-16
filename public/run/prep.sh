@@ -63,8 +63,8 @@ pacman-mirrors -f
 basestrap \
   /mnt \
   polkit\
-  linux515 \
-  linux515-headers \
+  linux626 \
+  linux626-headers \
   linux-firmware \
   dhclient \
   refind \
