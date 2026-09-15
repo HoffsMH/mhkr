@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+#
+# Build mhkr.xyz from a bare server. Run this once, on a new or rebuilt box;
+# ordinary content updates only need bin/deploy.
+#
+# Everything happens over ssh with plain apt and shell - no ansible, no
+# configuration management, nothing to install locally. If you are reading
+# this in a future where the tooling has rotted, the only things this needs
+# are ssh and a Debian-ish server.
+#
+# What it does: installs nginx/certbot/ufw/git, opens 80 and 443, writes a
+# minimal pre-TLS virtual host, and obtains the TLS certificate if the server
+# does not already have one.
+#
+# The vhost is written inline below rather than kept as a file in this repo,
+# because certbot REWRITES it on the server when it issues the certificate -
+# adding the listen 443 block, the ssl_certificate lines, and a second server
+# block that redirects http to https. A checked-in copy would therefore never
+# match what is running while looking like it did. What is below is the seed
+# certbot starts from. The server's copy is the real one; read it with:
+#
+#   ssh root@mhkr.xyz cat /etc/nginx/sites-enabled/default
+#
+# Re-running is safe. The certificate step is skipped when a certificate
+# exists, because Let's Encrypt rate-limits issuance, and the vhost step
+# refuses to clobber a certbot-managed config unless you pass --force.
+#
+# DNS must already point mhkr.xyz at the server before the certificate step
+# can succeed.
+
+set -Eeuo pipefail
+
+readonly ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly HOST="root@mhkr.xyz"
+readonly CERT_EMAIL="matthecker@pm.me"
+readonly DOMAIN="mhkr.xyz"
+
+cd "$ROOT"
+
+FORCE=""
+[ "${1:-}" = --force ] && FORCE=1
+
+say() { printf '\n==> %s\n' "$*"; }
+
+say "Installing packages and firewall rules on $HOST"
+ssh "$HOST" bash -s <<'REMOTE'
+set -Eeuo pipefail
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -qq
+apt-get install -y -qq cron git nginx python3-certbot python3-certbot-nginx rsync ufw
+ufw allow 80/tcp
+ufw allow 443/tcp
+systemctl enable --now nginx
+REMOTE
+
+say "Installing the virtual host"
+ssh "$HOST" FORCE="$FORCE" bash -s <<'REMOTE'
+set -Eeuo pipefail
+vhost=/etc/nginx/sites-enabled/default
+
+if [ -z "${FORCE:-}" ] && grep -q "managed by Certbot" "$vhost" 2>/dev/null; then
+  echo "$vhost is certbot-managed already; leaving it alone."
+  echo "Pass --force to replace it and re-run certbot from scratch."
+  exit 0
+fi
+
+cat > "$vhost" <<'CONF'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name mhkr.xyz www.mhkr.xyz;
+    root /var/www/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+
+        # Serve unknown extensions as readable text rather than as a download,
+        # so https://mhkr.xyz/omarchy.sh can be read in a browser before
+        # anyone runs it.
+        default_type text/plain;
+    }
+}
+CONF
+
+nginx -t
+systemctl reload nginx
+REMOTE
+
+say "Obtaining the certificate if the server does not have one"
+ssh "$HOST" DOMAIN="$DOMAIN" CERT_EMAIL="$CERT_EMAIL" bash -s <<'REMOTE'
+set -Eeuo pipefail
+if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+  echo "certificate already present; leaving it alone"
+else
+  certbot --nginx --non-interactive --agree-tos \
+    --email "$CERT_EMAIL" \
+    --domains "$DOMAIN" --domains "www.$DOMAIN"
+fi
+REMOTE
+
+say "Server is ready. Run bin/deploy to publish the site."

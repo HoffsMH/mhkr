@@ -1,0 +1,9 @@
+# The site's generated public/ directory is committed, so the hugo version is
+# part of the build's reproducibility. Pinned to the version that produced the
+# existing output; bumping it will produce a large public/ diff on the next
+# build, which is expected and fine - just review it.
+#
+# `mise install` in this directory fetches it. mise also installs on demand
+# the first time you run hugo.
+[tools]
+hugo = "0.111.3"

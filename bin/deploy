@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+#
+# Publish mhkr.xyz.
+#
+# How this site works, in one paragraph. The site is a Hugo build whose OUTPUT
+# is committed to this repository as public/. The server does not build
+# anything and nothing is uploaded from here: it clones this repo from GitHub
+# and copies public/ into its web root. So the rule is simply "whatever is on
+# origin/master is what goes live", and this script's job is to make that true
+# and then prove it.
+#
+# Requires: hugo (mise.toml pins the version), git push access, and ssh to
+# root@mhkr.xyz. Nothing else - no ansible, no secrets, no vault. The server
+# address is public DNS and the repo is public, so there is nothing to hide.
+#
+# Run `bin/provision` instead if the server is new or has been rebuilt.
+
+set -Eeuo pipefail
+
+readonly ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly HOST="root@mhkr.xyz"
+readonly REPO="https://github.com/HoffsMH/mhkr.git"
+readonly WEBROOT="/var/www/html"
+readonly OUTPUT="public"
+
+cd "$ROOT"
+
+say() { printf '\n==> %s\n' "$*"; }
+die() { printf '\nERROR: %s\n' "$*" >&2; exit 1; }
+
+# 1. Build. bin/build fails loudly if hugo is missing.
+say "Building with hugo"
+./bin/build
+
+# 2. Make sure the built output is committed. public/ is generated, so
+#    committing it automatically is safe and removes the most common way to
+#    deploy nothing: forgetting this step.
+if ! git diff --quiet -- "$OUTPUT" || [ -n "$(git ls-files --others --exclude-standard "$OUTPUT")" ]; then
+  say "Committing regenerated $OUTPUT"
+  git add "$OUTPUT"
+  git commit -m "site: rebuild $OUTPUT"
+else
+  say "$OUTPUT is already committed and unchanged"
+fi
+
+# 3. Make sure master is what the server will fetch.
+branch="$(git rev-parse --abbrev-ref HEAD)"
+[ "$branch" = master ] || die "on branch '$branch'; the server only ever fetches master"
+
+say "Pushing master to origin"
+git push origin master
+
+# 4. Publish. The server clones fresh each time rather than keeping a
+#    checkout, so a half-finished or hand-edited /srv/mhkr can never drift
+#    into the web root. rsync --delete means the web root is exactly public/
+#    and nothing else: a file removed from the repo disappears from the site
+#    instead of being served forever. .well-known is excluded because certbot
+#    writes renewal challenges there and they are not ours to delete.
+say "Publishing on $HOST"
+ssh "$HOST" REPO="$REPO" WEBROOT="$WEBROOT" OUTPUT="$OUTPUT" bash -s <<'REMOTE'
+set -Eeuo pipefail
+rm -rf /srv/mhkr
+git clone --quiet --depth 1 "$REPO" /srv/mhkr
+rsync -a --delete --exclude '.well-known' "/srv/mhkr/$OUTPUT/" "$WEBROOT/"
+rm -rf /srv/mhkr
+nginx -t
+systemctl reload nginx
+REMOTE
+
+# 5. Prove it. Comparing the live index against the one just built is the
+#    difference between "the script exited 0" and "the site is updated".
+say "Verifying https://mhkr.xyz/"
+local_sum="$(sha256sum "$OUTPUT/index.html" | cut -d' ' -f1)"
+live_sum="$(curl -fsS https://mhkr.xyz/ | sha256sum | cut -d' ' -f1)"
+
+if [ "$local_sum" = "$live_sum" ]; then
+  printf '\nDeployed. https://mhkr.xyz/ matches the local build.\n'
+else
+  die "https://mhkr.xyz/ does not match $OUTPUT/index.html.
+Check the server: ssh $HOST 'nginx -t; systemctl status nginx'"
+fi

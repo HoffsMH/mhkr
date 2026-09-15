@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Build the site into public/. That directory is committed - the server copies
+# it verbatim and never runs hugo - so the build output is a tracked artifact,
+# not a throwaway.
+#
+# The hugo version is pinned in mise.toml because a different version produces
+# a different public/.
+#
+# No --minify: on a 10KB site it saves about 150 bytes, which nginx's gzip
+# would have taken anyway, and it collapses every page to a single line. Since
+# public/ is committed and reviewed, readable diffs are worth more than that.
+
+set -Eeuo pipefail
+
+readonly ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+command -v hugo >/dev/null 2>&1 || {
+  echo 'hugo is required. Run `mise install` in this directory to get the pinned version.' >&2
+  exit 1
+}
+
+hugo
