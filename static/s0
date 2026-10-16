@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Stage 0 of a new-machine bootstrap. Unsigned, so read it before running:
+#   curl -fsSLo s0 https://mhkr.xyz/s0 && less s0 && bash s0
+# Trusts only pacman's signatures and PRIMARY below. Runs stage1.sh only if
+# it is signed by PRIMARY and the plugged-in card holds PRIMARY's signing subkey.
+set -euo pipefail
+
+PRIMARY=980D93A97C98DA434A1647CA4C58ED089E77CBDC
+BASE=${BOOT_URL:-https://mhkr.xyz}
+
+die() { echo "stage0: $*" >&2; exit 1; }
+
+# A fresh install has no sync databases yet, only the ISO's offline one, so
+# upgrade in full first (Arch does not support partial upgrades). Omarchy
+# refuses a direct pacman -Syu and wants its own updater.
+if command -v omarchy-update >/dev/null; then
+  omarchy-update -y
+else
+  sudo pacman -Syu --noconfirm
+fi
+sudo pacman -S --needed --noconfirm gnupg pcsclite ccid
+sudo systemctl enable --now pcscd.socket
+
+T=$(mktemp -d)
+export GNUPGHOME=$T/gnupg
+trap 'gpgconf --homedir "$T/gnupg" --kill all 2>/dev/null; rm -rf "$T"' EXIT
+mkdir -m 700 "$GNUPGHOME"
+printf 'disable-ccid\npcsc-shared\n' > "$GNUPGHOME/scdaemon.conf"
+
+curl -fsSL "$BASE/key.pub" | gpg -q --import 2>/dev/null
+subkeys=$(gpg --with-colons --with-subkey-fingerprint -k "$PRIMARY" 2>/dev/null |
+  awk -F: '$1=="fpr"{print $10}') || die "key.pub does not contain $PRIMARY"
+
+echo "stage0: reading YubiKey (plug it in if it is not)"
+card_sig=$(gpg --card-status --with-colons 2>/dev/null | awk -F: '$1=="fpr"{print $2}') || true
+[ -n "$card_sig" ] || die "no OpenPGP card found"
+grep -qx "$card_sig" <<<"$subkeys" || die "card signing key $card_sig is not a subkey of $PRIMARY"
+
+curl -fsSL -o "$T/stage1.sh" "$BASE/stage1.sh"
+curl -fsSL -o "$T/stage1.sh.asc" "$BASE/stage1.sh.asc"
+signer=$(gpg --status-fd 1 --verify "$T/stage1.sh.asc" "$T/stage1.sh" 2>/dev/null |
+  awk '$2=="VALIDSIG"{print $NF}') || true
+[ "$signer" = "$PRIMARY" ] || die "stage1.sh is not signed by $PRIMARY"
+
+echo "stage0: stage1.sh verified, running it"
+gpgconf --kill all
+unset GNUPGHOME
+bash "$T/stage1.sh" "$@"
