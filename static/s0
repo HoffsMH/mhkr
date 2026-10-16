@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Stage 0 of a new-machine bootstrap. Unsigned, so read it before running:
 #   curl -fsSLo s0 https://mhkr.xyz/s0 && less s0 && bash s0
-# Trusts only pacman's signatures and PRIMARY below. Runs stage1.sh only if
-# it is signed by PRIMARY and the plugged-in card holds PRIMARY's signing subkey.
+# Trusts the package manager (pacman's signatures; on macOS, Homebrew and its
+# installer from GitHub) and PRIMARY below. Runs stage1.sh only if it is
+# signed by PRIMARY and the plugged-in card holds PRIMARY's signing subkey.
+# Written for macOS's /bin/bash 3.2 as well as Linux.
 set -euo pipefail
 
 PRIMARY=980D93A97C98DA434A1647CA4C58ED089E77CBDC
@@ -10,16 +12,39 @@ BASE=${BOOT_URL:-https://mhkr.xyz}
 
 die() { echo "stage0: $*" >&2; exit 1; }
 
-# A fresh install has no sync databases yet, only the ISO's offline one, so
-# upgrade in full first (Arch does not support partial upgrades). Omarchy
-# refuses a direct pacman -Syu and wants its own updater.
-if command -v omarchy-update >/dev/null; then
-  omarchy-update -y
-else
-  sudo pacman -Syu --noconfirm
-fi
-sudo pacman -S --needed --noconfirm gnupg pcsclite ccid
-sudo systemctl enable --now pcscd.socket
+case "$(uname)" in
+  Linux)
+    command -v pacman >/dev/null || die "Linux support is Arch/Omarchy only (no pacman)"
+    # A fresh install has no sync databases yet, only the ISO's offline one,
+    # so upgrade in full first (Arch does not support partial upgrades).
+    # Omarchy refuses a direct pacman -Syu and wants its own updater.
+    if command -v omarchy-update >/dev/null; then
+      omarchy-update -y
+    else
+      sudo pacman -Syu --noconfirm
+    fi
+    sudo pacman -S --needed --noconfirm gnupg pcsclite ccid
+    sudo systemctl enable --now pcscd.socket
+    ;;
+  Darwin)
+    # A fresh Mac has no Homebrew. Its installer needs sudo but cannot prompt
+    # when non-interactive, so authenticate first. The installer also pulls
+    # in the Xcode command line tools, which provide git.
+    if ! command -v brew >/dev/null && [ ! -x /opt/homebrew/bin/brew ] && [ ! -x /usr/local/bin/brew ]; then
+      echo "stage0: installing Homebrew (asks for your login password)"
+      sudo -v
+      NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+    # Not on PATH until a new shell reads the prefix Homebrew chose.
+    for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+      if [ -x "$b" ]; then eval "$("$b" shellenv)"; break; fi
+    done
+    command -v brew >/dev/null || die "Homebrew install did not leave brew on PATH"
+    # macOS reads smart cards through its own CryptoTokenKit; no pcscd needed.
+    brew install gnupg
+    ;;
+  *) die "unsupported OS: $(uname)" ;;
+esac
 
 T=$(mktemp -d)
 export GNUPGHOME=$T/gnupg
