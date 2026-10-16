@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Stage 0 of a new-machine bootstrap. Unsigned, so read it before running:
-#   curl -fsSLo s0 https://mhkr.xyz/s0 && less s0 && bash s0
+#   curl -fsSLo boot https://mhkr.xyz/boot && less boot && bash boot
 # Trusts the package manager (pacman's signatures; on macOS, Homebrew and its
 # installer from GitHub) and PRIMARY below. Runs stage1.sh only if it is
 # signed by PRIMARY and the plugged-in card holds PRIMARY's signing subkey.

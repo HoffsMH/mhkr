@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Stage 1 of a new-machine bootstrap. Run by s0 only after it has checked this
+# Stage 1 of a new-machine bootstrap. Run by boot only after it has checked this
 # file's signature. Clones the public base toolkit and installs it; base's
 # setup.d sets up the YubiKey so private toolkits can be cloned over ssh.
 set -euo pipefail
